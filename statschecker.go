@@ -17,7 +17,7 @@ const (
 	diskThreshold    = 0.9 // 90%
 	networkThreshold = 0.9 // 90%
 	maxErrors        = 3
-	checkInterval    = 1 * time.Second // Изменила значение счетчика с 0 до 1
+	checkInterval    = 0 * time.Second // Изменила значение счетчика на 0;
 )
 
 func main() {
