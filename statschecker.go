@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"math"
 	"net/http"
 	"strconv"
 	"strings"
@@ -12,12 +11,12 @@ import (
 
 const (
 	serverURL        = "http://srv.msk01.gigacorp.local/_stats"
-	loadThreshold    = 30.0
-	memoryThreshold  = 0.8 // 80%
-	diskThreshold    = 0.9 // 90%
-	networkThreshold = 0.9 // 90%
+	loadThreshold    = 30
+	memoryThreshold  = 80 // 80%
+	diskThreshold    = 90 // 90%
+	networkThreshold = 90 // 90%
 	maxErrors        = 3
-	checkInterval    = 0 * time.Second // Изменила значение счетчика на 0;
+	checkInterval    = 0 * time.Second
 )
 
 func main() {
@@ -47,7 +46,7 @@ func main() {
 	}
 }
 
-func fetchStats() ([]float64, error) {
+func fetchStats() ([]int, error) {
 	resp, err := http.Get(serverURL)
 	if err != nil {
 		return nil, err
@@ -72,9 +71,9 @@ func fetchStats() ([]float64, error) {
 	}
 
 	// Парсим числовые значения
-	stats := make([]float64, 7)
+	stats := make([]int, 7)
 	for i, val := range values {
-		parsed, err := strconv.ParseFloat(strings.TrimSpace(val), 64)
+		parsed, err := strconv.Atoi(strings.TrimSpace(val))
 		if err != nil {
 			return nil, fmt.Errorf("invalid number format: %v", err)
 		}
@@ -84,22 +83,20 @@ func fetchStats() ([]float64, error) {
 	return stats, nil
 }
 
-func checkMetrics(stats []float64) {
+func checkMetrics(stats []int) {
 	// 0: Load Average
 	load := stats[0]
 	if load > loadThreshold {
-		fmt.Printf("Load Average is too high: %.0f\n", load)
+		fmt.Printf("Load Average is too high: %d\n", load)
 	}
 
 	// 1: Total RAM, 2: Used RAM
 	totalRAM := stats[1]
 	usedRAM := stats[2]
 	if totalRAM > 0 {
-		memoryUsage := usedRAM / totalRAM
+		memoryUsage := usedRAM * 100 / totalRAM
 		if memoryUsage > memoryThreshold {
-			percentage := memoryUsage * 100
-			percentage = math.Floor(percentage) // Округление вниз
-			fmt.Printf("Memory usage too high: %.0f%%\n", percentage)
+			fmt.Printf("Memory usage too high: %d%%\n", memoryUsage)
 		}
 	}
 
@@ -107,11 +104,10 @@ func checkMetrics(stats []float64) {
 	totalDisk := stats[3]
 	usedDisk := stats[4]
 	if totalDisk > 0 {
-		diskUsage := usedDisk / totalDisk
+		diskUsage := usedDisk * 100 / totalDisk
 		if diskUsage > diskThreshold {
 			freeMB := (totalDisk - usedDisk) / (1024 * 1024)
-			freeMB = math.Floor(freeMB) // Округление вниз
-			fmt.Printf("Free disk space is too low: %.0f Mb left\n", freeMB)
+			fmt.Printf("Free disk space is too low: %d Mb left\n", freeMB)
 		}
 	}
 
@@ -119,12 +115,10 @@ func checkMetrics(stats []float64) {
 	totalNetwork := stats[5]
 	usedNetwork := stats[6]
 	if totalNetwork > 0 {
-		networkUsage := usedNetwork / totalNetwork
+		networkUsage := usedNetwork * 100 / totalNetwork
 		if networkUsage > networkThreshold {
-			// Конвертируем байты/сек в мегабиты/сек
-			// 1 байт/сек = 8 бит/сек, 1 мегабит = 1,000,000 бит
 			freeMbits := (totalNetwork - usedNetwork) / 1000000
-			fmt.Printf("Network bandwidth usage high: %.0f Mbit/s available\n", freeMbits)
+			fmt.Printf("Network bandwidth usage high: %d Mbit/s available\n", freeMbits)
 		}
 	}
 }
