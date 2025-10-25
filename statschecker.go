@@ -122,8 +122,9 @@ func checkMetrics(stats []float64) {
 		networkUsage := usedNetwork / totalNetwork
 		if networkUsage > networkThreshold {
 			// Просто разница в мегабайтах
-        freeMbits := (totalNetwork - usedNetwork) / (1024 * 1024)
-        fmt.Printf("Network bandwidth usage high: %.0f Mbit/s available\n", freeMbits)
+			freeMbits := (totalNetwork - usedNetwork) / (1024 * 1024)
+			freeMbits = math.Round(freeMbits)
+			fmt.Printf("Network bandwidth usage high: %.0f Mbit/s available\n", freeMbits)
 		}
 	}
 }
