@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"math"
 	"net/http"
 	"strconv"
 	"strings"
@@ -97,6 +98,7 @@ func checkMetrics(stats []float64) {
 		memoryUsage := usedRAM / totalRAM
 		if memoryUsage > memoryThreshold {
 			percentage := memoryUsage * 100
+			percentage = math.Floor(percentage) // Округление вниз
 			fmt.Printf("Memory usage too high: %.0f%%\n", percentage)
 		}
 	}
@@ -108,6 +110,7 @@ func checkMetrics(stats []float64) {
 		diskUsage := usedDisk / totalDisk
 		if diskUsage > diskThreshold {
 			freeMB := (totalDisk - usedDisk) / (1024 * 1024)
+			freeMB = math.Floor(freeMB) // Округление вниз
 			fmt.Printf("Free disk space is too low: %.0f Mb left\n", freeMB)
 		}
 	}
@@ -120,6 +123,7 @@ func checkMetrics(stats []float64) {
 		if networkUsage > networkThreshold {
 			// Конвертируем из байт/сек в мегабит/сек
 			freeMbits := (totalNetwork - usedNetwork) * 8 / (1000 * 1000)
+			freeMbits = math.Floor(freeMbits) // Округление вниз
 			fmt.Printf("Network bandwidth usage high: %.0f Mbit/s available\n", freeMbits)
 		}
 	}
