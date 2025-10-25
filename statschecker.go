@@ -87,7 +87,7 @@ func checkMetrics(stats []float64) {
 	// 0: Load Average
 	load := stats[0]
 	if load > loadThreshold {
-		fmt.Printf("Load Average is too high: %.2f\n", load)
+		fmt.Printf("Load Average is too high: %.0f\n", load)
 	}
 
 	// 1: Total RAM, 2: Used RAM
@@ -97,7 +97,7 @@ func checkMetrics(stats []float64) {
 		memoryUsage := usedRAM / totalRAM
 		if memoryUsage > memoryThreshold {
 			percentage := memoryUsage * 100
-			fmt.Printf("Memory usage too high: %.1f%%\n", percentage)
+			fmt.Printf("Memory usage too high: %.0f%%\n", percentage)
 		}
 	}
 
@@ -120,7 +120,7 @@ func checkMetrics(stats []float64) {
 		if networkUsage > networkThreshold {
 			// Конвертируем из байт/сек в мегабит/сек
 			freeMbits := (totalNetwork - usedNetwork) * 8 / (1000 * 1000)
-			fmt.Printf("Network bandwidth usage high: %.1f Mbit/s available\n", freeMbits)
+			fmt.Printf("Network bandwidth usage high: %.0f Mbit/s available\n", freeMbits)
 		}
 	}
 }
